@@ -26,3 +26,7 @@ apt-get install cmake libasound2-dev mesa-common-dev libx11-dev libxrandr-dev li
 ## raylib limitations
 
 It says it supports Direct3D, Metal, through ANGLE, but support may be very experimental
+
+## Animation reference
+
+https://www.raylib.com/examples/textures/loader.html?name=textures_sprite_anim
