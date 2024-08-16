@@ -42,8 +42,18 @@ fn main() {
             height: player_height,
         };
 
+        let frame_rec_right = Rectangle {
+            x: sprite_index.as_f32() * player_width,
+            y: 0.,
+            // negative width to flip the sprite
+            width: -player_width,
+            height: player_height,
+        };
+
         let player_pos = Vector2 { x: 120., y: 120. };
+        let player_pos2 = Vector2 { x: 120., y: 240. };
 
         d.draw_texture_rec(&player_text, frame_rec, player_pos, Color::WHITE);
+        d.draw_texture_rec(&player_text, frame_rec_right, player_pos2, Color::WHITE);
     }
 }
