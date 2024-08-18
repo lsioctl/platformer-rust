@@ -1,15 +1,13 @@
-use std::fs::DirEntry;
-
 use raylib::prelude::*;
 
-pub enum Direction {
-    Right,
-    Left,
+pub enum Flip {
+    Yes,
+    No,
 }
 
 pub struct Animation {
     texture: Texture2D,
-    direction: Direction,
+    flip: Flip,
     sprite_count: u32,
     height: f32,
     width: f32,
@@ -24,12 +22,11 @@ impl Animation {
     pub fn new(
         rl: &mut RaylibHandle,
         thread: &RaylibThread,
+        filename: &str,
         sprite_count: u32,
-        direction: Direction,
+        flip: Flip,
     ) -> Self {
-        let texture = rl
-            .load_texture(&thread, "./ressources/Sprites/Player/Run.png")
-            .unwrap();
+        let texture = rl.load_texture(&thread, filename).unwrap();
 
         let height = texture.height.as_f32();
         let width = height;
@@ -42,7 +39,7 @@ impl Animation {
 
         Self {
             texture,
-            direction,
+            flip,
             height,
             width,
             sprite_index,
@@ -66,7 +63,7 @@ impl Animation {
         if self.frame_counter > (60 / self.frame_speed) {
             self.frame_counter = 0;
             self.sprite_index = self.sprite_index + 1;
-            if self.sprite_index > 9 {
+            if self.sprite_index > self.sprite_count - 1 {
                 self.sprite_index = 0;
             }
         }
@@ -74,10 +71,10 @@ impl Animation {
         let frame_rec = Rectangle {
             x: self.sprite_index.as_f32() * self.width,
             y: 0.,
-            width: match self.direction {
-                Direction::Left => self.width,
+            width: match self.flip {
+                Flip::No => self.width,
                 // negative width to flip the sprite
-                Direction::Right => -self.width,
+                Flip::Yes => -self.width,
             },
             height: self.height,
         };

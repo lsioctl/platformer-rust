@@ -9,10 +9,28 @@ fn main() {
 
     let (mut rl, thread) = raylib::init().size(640, 480).title("Hello, World").build();
 
-    let mut player_animation_run_left =
-        animation::Animation::new(&mut rl, &thread, 9, animation::Direction::Left);
-    let mut player_animation_run_right =
-        animation::Animation::new(&mut rl, &thread, 9, animation::Direction::Right);
+    let mut player_animation_run_left = animation::Animation::new(
+        &mut rl,
+        &thread,
+        "./ressources/Sprites/Player/Run.png",
+        9,
+        animation::Flip::No,
+    );
+    let mut player_animation_run_right = animation::Animation::new(
+        &mut rl,
+        &thread,
+        "./ressources/Sprites/Player/Run.png",
+        9,
+        animation::Flip::Yes,
+    );
+
+    let mut player_animation_idle = animation::Animation::new(
+        &mut rl,
+        &thread,
+        "./ressources/Sprites/Player/Idle.png",
+        1,
+        animation::Flip::No,
+    );
 
     rl.set_target_fps(60);
 
@@ -35,5 +53,6 @@ fn main() {
 
         player_animation_run_left.play(&mut d, Vector2 { x: 100.0, y: 100.0 });
         player_animation_run_right.play(&mut d, Vector2 { x: 100.0, y: 200.0 });
+        player_animation_idle.play(&mut d, Vector2 { x: 100.0, y: 300.0 });
     }
 }
