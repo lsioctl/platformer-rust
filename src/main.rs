@@ -1,4 +1,4 @@
-use platformer_rust::player;
+use platformer_rust::animation;
 use std::time::Instant;
 
 use raylib::prelude::*;
@@ -9,8 +9,10 @@ fn main() {
 
     let (mut rl, thread) = raylib::init().size(640, 480).title("Hello, World").build();
 
-    let mut player = player::Player::new(&mut rl, &thread);
-    let mut player2 = player::Player::new(&mut rl, &thread);
+    let mut player_animation_run_left =
+        animation::Animation::new(&mut rl, &thread, 9, animation::Direction::Left);
+    let mut player_animation_run_right =
+        animation::Animation::new(&mut rl, &thread, 9, animation::Direction::Right);
 
     rl.set_target_fps(60);
 
@@ -31,7 +33,7 @@ fn main() {
         animation_elapsed_time = animation_elapsed_time + delta_time;
         println!("{}", animation_elapsed_time);
 
-        player.animate_left(&mut d);
-        player2.animate_right(&mut d);
+        player_animation_run_left.play(&mut d, Vector2 { x: 100.0, y: 100.0 });
+        player_animation_run_right.play(&mut d, Vector2 { x: 100.0, y: 200.0 });
     }
 }
