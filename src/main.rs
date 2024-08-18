@@ -9,12 +9,8 @@ fn main() {
 
     let (mut rl, thread) = raylib::init().size(640, 480).title("Hello, World").build();
 
-    let player = player::Player::new(&mut rl, &thread);
-
-    let mut sprite_index = 0;
-    let mut frame_counter = 0;
-    // number of frames showb by second
-    let frame_speed = 8;
+    let mut player = player::Player::new(&mut rl, &thread);
+    let mut player2 = player::Player::new(&mut rl, &thread);
 
     rl.set_target_fps(60);
 
@@ -35,35 +31,7 @@ fn main() {
         animation_elapsed_time = animation_elapsed_time + delta_time;
         println!("{}", animation_elapsed_time);
 
-        frame_counter = frame_counter + 1;
-
-        if frame_counter > (60 / frame_speed) {
-            frame_counter = 0;
-            sprite_index = sprite_index + 1;
-            if sprite_index > 9 {
-                sprite_index = 0;
-            }
-        }
-
-        let frame_rec = Rectangle {
-            x: sprite_index.as_f32() * player.width,
-            y: 0.,
-            width: player.width,
-            height: player.height,
-        };
-
-        let frame_rec_right = Rectangle {
-            x: sprite_index.as_f32() * player.width,
-            y: 0.,
-            // negative width to flip the sprite
-            width: -player.width,
-            height: player.height,
-        };
-
-        let player_pos = Vector2 { x: 120., y: 120. };
-        let player_pos2 = Vector2 { x: 120., y: 240. };
-
-        d.draw_texture_rec(&player.texture, frame_rec, player_pos, Color::WHITE);
-        d.draw_texture_rec(&player.texture, frame_rec_right, player_pos2, Color::WHITE);
+        player.animate_left(&mut d);
+        player2.animate_right(&mut d);
     }
 }
