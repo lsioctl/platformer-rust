@@ -8,7 +8,7 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Player {
+    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
         let texture = rl
             .load_texture(&thread, "./ressources/Sprites/Player/Run.png")
             .unwrap();
@@ -16,11 +16,11 @@ impl Player {
         let height = texture.height.as_f32();
         let width = height;
 
-        return Player {
+        Self {
             position: Vector2 { x: 0., y: 0. },
             texture,
             height,
             width,
-        };
+        }
     }
 }
