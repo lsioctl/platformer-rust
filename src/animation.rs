@@ -13,21 +13,13 @@ pub struct Animation {
     width: f32,
     sprite_index: u32,
     frame_counter: u32,
-    // number of frames showb by second
+    // number of animation frames shown by second
     frame_speed: u32,
     is_playing: bool,
 }
 
 impl Animation {
-    pub fn new(
-        rl: &mut RaylibHandle,
-        thread: &RaylibThread,
-        filename: &str,
-        sprite_count: u32,
-        flip: Flip,
-    ) -> Self {
-        let texture = rl.load_texture(&thread, filename).unwrap();
-
+    pub fn new(texture: Texture2D, sprite_count: u32, flip: Flip) -> Self {
         let height = texture.height.as_f32();
         let width = height;
 
@@ -60,6 +52,9 @@ impl Animation {
 
         self.frame_counter = self.frame_counter + 1;
 
+        // TODO: here magic number asuming we are at 60 fps
+        // it may be better to work with animation elapsed time
+        // and delta time
         if self.frame_counter > (60 / self.frame_speed) {
             self.frame_counter = 0;
             self.sprite_index = self.sprite_index + 1;

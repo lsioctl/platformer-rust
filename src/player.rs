@@ -1,98 +1,71 @@
+use crate::animation;
 use raylib::prelude::*;
+
+enum Movement {
+    Right,
+    Left,
+    Idle,
+}
 
 pub struct Player {
     pub position: Vector2,
-    pub texture: Texture2D,
-    pub height: f32,
-    pub width: f32,
-    sprite_index: u32,
-    frame_counter: u32,
-    // number of frames showb by second
-    frame_speed: u32,
+    speed: f32,
+    animation_run_left: animation::Animation,
+    animation_run_right: animation::Animation,
+    animation_idle: animation::Animation,
+    movement: Movement,
 }
 
 impl Player {
     pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
-        let texture = rl
-            .load_texture(&thread, "./ressources/Sprites/Player/Run.png")
-            .unwrap();
+        // I do not want to store the texture in Player struct
+        // Texture is small in size, and implements Copy trait
+        // moreover I think it belongs to the animation
+        let animation_run_left = animation::Animation::new(
+            rl.load_texture(&thread, "./ressources/Sprites/Player/Run.png")
+                .unwrap(),
+            9,
+            animation::Flip::No,
+        );
+        let animation_run_right = animation::Animation::new(
+            rl.load_texture(&thread, "./ressources/Sprites/Player/Run.png")
+                .unwrap(),
+            9,
+            animation::Flip::Yes,
+        );
 
-        let height = texture.height.as_f32();
-        let width = height;
-
-        let sprite_index = 0;
-        let frame_counter = 0;
-        let frame_speed = 8;
-
+        let animation_idle = animation::Animation::new(
+            rl.load_texture(&thread, "./ressources/Sprites/Player/Idle.png")
+                .unwrap(),
+            1,
+            animation::Flip::No,
+        );
         Self {
-            position: Vector2 { x: 0., y: 0. },
-            texture,
-            height,
-            width,
-            sprite_index,
-            frame_counter,
-            frame_speed,
+            position: Vector2 { x: 100., y: 100. },
+            speed: 100.0,
+            animation_run_right,
+            animation_run_left,
+            animation_idle,
+            movement: Movement::Idle,
+        }
+    }
+    pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
+        if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
+            self.position.x = self.position.x + self.speed * delta_time;
+            self.movement = Movement::Right;
+        } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
+            self.position.x = self.position.x - self.speed * delta_time;
+            self.movement = Movement::Left;
+        } else {
+            self.movement = Movement::Idle;
         }
     }
 
-    pub fn animate_left(&mut self, d: &mut RaylibDrawHandle) {
-        self.frame_counter = self.frame_counter + 1;
-
-        if self.frame_counter > (60 / self.frame_speed) {
-            self.frame_counter = 0;
-            self.sprite_index = self.sprite_index + 1;
-            if self.sprite_index > 9 {
-                self.sprite_index = 0;
-            }
+    pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
+        match self.movement {
+            Movement::Right => self.animation_run_right.play(d, self.position),
+            Movement::Left => self.animation_run_left.play(d, self.position),
+            Movement::Idle => self.animation_idle.play(d, self.position),
         }
-
-        let frame_rec = Rectangle {
-            x: self.sprite_index.as_f32() * self.width,
-            y: 0.,
-            width: self.width,
-            height: self.height,
-        };
-
-        // let frame_rec_right = Rectangle {
-        //     x: sprite_index.as_f32() * player.width,
-        //     y: 0.,
-        //     // negative width to flip the sprite
-        //     width: -player.width,
-        //     height: player.height,
-        // };
-
-        d.draw_texture_rec(
-            &self.texture,
-            frame_rec,
-            Vector2 { x: 120., y: 120. },
-            Color::WHITE,
-        );
-    }
-
-    pub fn animate_right(&mut self, d: &mut RaylibDrawHandle) {
-        self.frame_counter = self.frame_counter + 1;
-
-        if self.frame_counter > (60 / self.frame_speed) {
-            self.frame_counter = 0;
-            self.sprite_index = self.sprite_index + 1;
-            if self.sprite_index > 9 {
-                self.sprite_index = 0;
-            }
-        }
-
-        let frame_rec = Rectangle {
-            x: self.sprite_index.as_f32() * self.width,
-            y: 0.,
-            // negative width to flip the sprite
-            width: -self.width,
-            height: self.height,
-        };
-
-        d.draw_texture_rec(
-            &self.texture,
-            frame_rec,
-            Vector2 { x: 120., y: 240. },
-            Color::WHITE,
-        );
     }
 }
