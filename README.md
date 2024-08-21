@@ -30,3 +30,14 @@ It says it supports Direct3D, Metal, through ANGLE, but support may be very expe
 ## Animation reference
 
 https://www.raylib.com/examples/textures/loader.html?name=textures_sprite_anim
+
+## Keyboard input
+
+Coming from Raylib examples in C I was stuck with ffi and unsafe calls, this documentation
+showed me how to use proper Rust calls:
+
+https://pls.plaureano.com/blog/files/Example-code-2-rust.php
+
+## Parallax reference
+
+https://www.raylib.com/examples/textures/loader.html?name=textures_background_scrolling
