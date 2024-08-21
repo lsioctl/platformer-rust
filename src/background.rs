@@ -21,6 +21,7 @@ impl Background {
         }
     }
 
+    // Draw backgound with parallax
     pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
         self.scrolling_back = self.scrolling_back - 0.1;
         self.scrolling_front = self.scrolling_front - 0.5;
@@ -73,5 +74,11 @@ impl Background {
             1.,
             Color::WHITE,
         );
+    }
+
+    /// Draw backgound without parallax
+    pub fn draw_static(&mut self, d: &mut RaylibDrawHandle) {
+        d.draw_texture(&self.texture_back, 0, 0, Color::WHITE);
+        d.draw_texture(&self.texture_front, 0, 0, Color::WHITE);
     }
 }
