@@ -5,6 +5,8 @@ enum Movement {
     Right,
     Left,
     Idle,
+    JumpRight,
+    JumpLeft,
 }
 
 pub struct Player {
@@ -13,6 +15,8 @@ pub struct Player {
     animation_run_left: animation::Animation,
     animation_run_right: animation::Animation,
     animation_idle: animation::Animation,
+    animation_jump_left: animation::Animation,
+    animation_jump_right: animation::Animation,
     movement: Movement,
 }
 
@@ -40,12 +44,29 @@ impl Player {
             1,
             animation::Flip::No,
         );
+
+        let animation_jump_left = animation::Animation::new(
+            rl.load_texture(&thread, "./ressources/Sprites/Player/Jump.png")
+                .unwrap(),
+            10,
+            animation::Flip::No,
+        );
+
+        let animation_jump_right = animation::Animation::new(
+            rl.load_texture(&thread, "./ressources/Sprites/Player/Jump.png")
+                .unwrap(),
+            10,
+            animation::Flip::Yes,
+        );
+
         Self {
             position: Vector2 { x: 100., y: 100. },
             speed: 100.0,
             animation_run_right,
             animation_run_left,
             animation_idle,
+            animation_jump_left,
+            animation_jump_right,
             movement: Movement::Idle,
         }
     }
@@ -53,9 +74,15 @@ impl Player {
         if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
             self.position.x = self.position.x + self.speed * delta_time;
             self.movement = Movement::Right;
+            if rl.is_key_down(KeyboardKey::KEY_SPACE) {
+                self.movement = Movement::JumpRight
+            }
         } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
             self.position.x = self.position.x - self.speed * delta_time;
             self.movement = Movement::Left;
+            if rl.is_key_down(KeyboardKey::KEY_SPACE) {
+                self.movement = Movement::JumpLeft
+            }
         } else {
             self.movement = Movement::Idle;
         }
@@ -66,6 +93,8 @@ impl Player {
             Movement::Right => self.animation_run_right.play(d, self.position),
             Movement::Left => self.animation_run_left.play(d, self.position),
             Movement::Idle => self.animation_idle.play(d, self.position),
+            Movement::JumpRight => self.animation_jump_right.play(d, self.position),
+            Movement::JumpLeft => self.animation_jump_left.play(d, self.position),
         }
     }
 }
