@@ -28,13 +28,13 @@ impl Player {
         let animation_run_left = animation::Animation::new(
             rl.load_texture(&thread, "./ressources/Sprites/Player/Run.png")
                 .unwrap(),
-            9,
+            10,
             animation::Flip::No,
         );
         let animation_run_right = animation::Animation::new(
             rl.load_texture(&thread, "./ressources/Sprites/Player/Run.png")
                 .unwrap(),
-            9,
+            10,
             animation::Flip::Yes,
         );
 
@@ -48,14 +48,14 @@ impl Player {
         let animation_jump_left = animation::Animation::new(
             rl.load_texture(&thread, "./ressources/Sprites/Player/Jump.png")
                 .unwrap(),
-            10,
+            11,
             animation::Flip::No,
         );
 
         let animation_jump_right = animation::Animation::new(
             rl.load_texture(&thread, "./ressources/Sprites/Player/Jump.png")
                 .unwrap(),
-            10,
+            11,
             animation::Flip::Yes,
         );
 
