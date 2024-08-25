@@ -10,8 +10,7 @@ enum Movement {
 }
 
 const MAX_JUMP_TIME: f32 = 0.5;
-const GROUND_POSITION: f32 = 400.0;
-const JUMP_FORCE_X: f32 = 5.0;
+const GROUND_HEIGHT: f32 = 400.0;
 const JUMP_FORCE_Y: f32 = 10.0;
 const GRAVITY: f32 = 200.0;
 
@@ -70,7 +69,7 @@ impl Player {
         Self {
             position: Vector2 {
                 x: 100.,
-                y: GROUND_POSITION - 300.0,
+                y: GROUND_HEIGHT - 300.0,
             },
             speed: 100.0,
             animation_run_right,
@@ -83,6 +82,7 @@ impl Player {
             jumptime: 0.0,
         }
     }
+
     pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
         if self.is_jumping == true {
             self.jump(delta_time);
@@ -110,13 +110,17 @@ impl Player {
         }
     }
 
-    pub fn apply_physics(&mut self, delta_time: f32) {
-        if self.position.y < GROUND_POSITION {
+    fn apply_physics(&mut self, delta_time: f32) {
+        if !self.is_on_ground() {
             self.position.y = self.position.y + GRAVITY * delta_time;
         }
     }
 
-    pub fn jump(&mut self, delta_time: f32) {
+    fn is_on_ground(&self) -> bool {
+        self.position.y >= GROUND_HEIGHT
+    }
+
+    fn jump(&mut self, delta_time: f32) {
         self.jumptime = self.jumptime + delta_time;
         println!("{}", self.jumptime);
 
@@ -128,7 +132,7 @@ impl Player {
             x if x > MAX_JUMP_TIME => {
                 println!("------------------------------------");
 
-                self.position.y = GROUND_POSITION;
+                self.position.y = GROUND_HEIGHT;
                 self.is_jumping = false;
                 self.jumptime = 0.0;
                 self.movement = Movement::Idle;
