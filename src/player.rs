@@ -9,6 +9,12 @@ enum Movement {
     JumpLeft,
 }
 
+const MAX_JUMP_TIME: f32 = 0.5;
+const GROUND_POSITION: f32 = 400.0;
+const JUMP_FORCE_X: f32 = 5.0;
+const JUMP_FORCE_Y: f32 = 10.0;
+const GRAVITY: f32 = 200.0;
+
 pub struct Player {
     pub position: Vector2,
     speed: f32,
@@ -18,6 +24,8 @@ pub struct Player {
     animation_jump_left: animation::Animation,
     animation_jump_right: animation::Animation,
     movement: Movement,
+    is_jumping: bool,
+    jumptime: f32,
 }
 
 impl Player {
@@ -60,7 +68,10 @@ impl Player {
         );
 
         Self {
-            position: Vector2 { x: 100., y: 100. },
+            position: Vector2 {
+                x: 100.,
+                y: GROUND_POSITION - 300.0,
+            },
             speed: 100.0,
             animation_run_right,
             animation_run_left,
@@ -68,23 +79,65 @@ impl Player {
             animation_jump_left,
             animation_jump_right,
             movement: Movement::Idle,
+            is_jumping: false,
+            jumptime: 0.0,
         }
     }
     pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
+        if self.is_jumping == true {
+            self.jump(delta_time);
+            return ();
+        }
+
+        self.apply_physics(delta_time);
+
         if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
             self.position.x = self.position.x + self.speed * delta_time;
             self.movement = Movement::Right;
             if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-                self.movement = Movement::JumpRight
+                self.movement = Movement::JumpRight;
+                self.jump(delta_time);
             }
         } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
             self.position.x = self.position.x - self.speed * delta_time;
             self.movement = Movement::Left;
             if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-                self.movement = Movement::JumpLeft
+                self.movement = Movement::JumpLeft;
+                self.jump(delta_time);
             }
         } else {
             self.movement = Movement::Idle;
+        }
+    }
+
+    pub fn apply_physics(&mut self, delta_time: f32) {
+        if self.position.y < GROUND_POSITION {
+            self.position.y = self.position.y + GRAVITY * delta_time;
+        }
+    }
+
+    pub fn jump(&mut self, delta_time: f32) {
+        self.jumptime = self.jumptime + delta_time;
+        println!("{}", self.jumptime);
+
+        match self.jumptime {
+            x if x < MAX_JUMP_TIME / 2.0 => {
+                println!("less");
+                self.position.y = self.position.y - JUMP_FORCE_Y;
+            }
+            x if x > MAX_JUMP_TIME => {
+                println!("------------------------------------");
+
+                self.position.y = GROUND_POSITION;
+                self.is_jumping = false;
+                self.jumptime = 0.0;
+                self.movement = Movement::Idle;
+            }
+            _ => {
+                println!("more");
+
+                self.position.y = self.position.y + JUMP_FORCE_Y;
+            }
         }
     }
 
