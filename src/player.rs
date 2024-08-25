@@ -111,11 +111,13 @@ impl Player {
                 self.position.x = self.position.x - self.speed * delta_time;
                 self.movement = Movement::Left;
                 self.last_facing = LastFacing::Left;
-            } else if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-                self.is_jumping = true;
-                self.jump(delta_time);
             } else {
                 self.movement = Movement::Idle;
+            }
+
+            if rl.is_key_down(KeyboardKey::KEY_SPACE) {
+                self.is_jumping = true;
+                self.jump(delta_time);
             }
         } else {
             if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
