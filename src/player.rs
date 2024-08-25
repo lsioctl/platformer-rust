@@ -9,6 +9,11 @@ enum Movement {
     JumpLeft,
 }
 
+enum LastFacing {
+    Right,
+    Left,
+}
+
 const MAX_JUMP_TIME: f32 = 0.5;
 const GROUND_HEIGHT: f32 = 400.0;
 const JUMP_FORCE_Y: f32 = 10.0;
@@ -25,6 +30,7 @@ pub struct Player {
     movement: Movement,
     is_jumping: bool,
     jumptime: f32,
+    last_facing: LastFacing,
 }
 
 impl Player {
@@ -80,13 +86,19 @@ impl Player {
             movement: Movement::Idle,
             is_jumping: false,
             jumptime: 0.0,
+            last_facing: LastFacing::Right,
         }
     }
 
     pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
-        if self.is_jumping == true {
-            self.jump(delta_time);
-            return ();
+        if rl.is_key_down(KeyboardKey::KEY_SPACE) {
+            if !self.is_jumping {
+                self.movement = match self.last_facing {
+                    LastFacing::Left => Movement::JumpLeft,
+                    LastFacing::Right => Movement::JumpRight,
+                };
+                self.jump(delta_time);
+            }
         }
 
         self.apply_physics(delta_time);
@@ -94,17 +106,11 @@ impl Player {
         if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
             self.position.x = self.position.x + self.speed * delta_time;
             self.movement = Movement::Right;
-            if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-                self.movement = Movement::JumpRight;
-                self.jump(delta_time);
-            }
+            self.last_facing = LastFacing::Right;
         } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
             self.position.x = self.position.x - self.speed * delta_time;
             self.movement = Movement::Left;
-            if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-                self.movement = Movement::JumpLeft;
-                self.jump(delta_time);
-            }
+            self.last_facing = LastFacing::Left;
         } else {
             self.movement = Movement::Idle;
         }
