@@ -92,13 +92,6 @@ impl Player {
     }
 
     pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
-        if rl.is_key_down(KeyboardKey::KEY_SPACE) {
-            if !self.is_jumping {
-                self.is_jumping = true;
-                self.jump(delta_time);
-            }
-        }
-
         if self.is_jumping {
             self.movement = match self.last_facing {
                 LastFacing::Left => Movement::JumpLeft,
@@ -109,7 +102,7 @@ impl Player {
 
         self.apply_physics(delta_time);
 
-        if !self.is_jumping {
+        if self.is_on_ground() {
             if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
                 self.position.x = self.position.x + self.speed * delta_time;
                 self.movement = Movement::Right;
@@ -118,6 +111,9 @@ impl Player {
                 self.position.x = self.position.x - self.speed * delta_time;
                 self.movement = Movement::Left;
                 self.last_facing = LastFacing::Left;
+            } else if rl.is_key_down(KeyboardKey::KEY_SPACE) {
+                self.is_jumping = true;
+                self.jump(delta_time);
             } else {
                 self.movement = Movement::Idle;
             }
