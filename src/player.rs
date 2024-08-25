@@ -1,6 +1,7 @@
 use crate::animation;
 use raylib::prelude::*;
 
+#[derive(Debug)]
 enum Movement {
     Right,
     Left,
@@ -93,26 +94,43 @@ impl Player {
     pub fn update(&mut self, rl: &RaylibHandle, delta_time: f32) {
         if rl.is_key_down(KeyboardKey::KEY_SPACE) {
             if !self.is_jumping {
-                self.movement = match self.last_facing {
-                    LastFacing::Left => Movement::JumpLeft,
-                    LastFacing::Right => Movement::JumpRight,
-                };
+                self.is_jumping = true;
                 self.jump(delta_time);
             }
         }
 
+        if self.is_jumping {
+            self.movement = match self.last_facing {
+                LastFacing::Left => Movement::JumpLeft,
+                LastFacing::Right => Movement::JumpRight,
+            };
+            self.jump(delta_time);
+        }
+
         self.apply_physics(delta_time);
 
-        if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
-            self.position.x = self.position.x + self.speed * delta_time;
-            self.movement = Movement::Right;
-            self.last_facing = LastFacing::Right;
-        } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
-            self.position.x = self.position.x - self.speed * delta_time;
-            self.movement = Movement::Left;
-            self.last_facing = LastFacing::Left;
+        if !self.is_jumping {
+            if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
+                self.position.x = self.position.x + self.speed * delta_time;
+                self.movement = Movement::Right;
+                self.last_facing = LastFacing::Right;
+            } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
+                self.position.x = self.position.x - self.speed * delta_time;
+                self.movement = Movement::Left;
+                self.last_facing = LastFacing::Left;
+            } else {
+                self.movement = Movement::Idle;
+            }
         } else {
-            self.movement = Movement::Idle;
+            if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
+                self.position.x = self.position.x + self.speed * delta_time;
+                self.movement = Movement::JumpRight;
+                self.last_facing = LastFacing::Right;
+            } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
+                self.position.x = self.position.x - self.speed * delta_time;
+                self.movement = Movement::JumpLeft;
+                self.last_facing = LastFacing::Left;
+            }
         }
     }
 
@@ -137,21 +155,17 @@ impl Player {
             }
             x if x > MAX_JUMP_TIME => {
                 println!("------------------------------------");
-
-                self.position.y = GROUND_HEIGHT;
                 self.is_jumping = false;
                 self.jumptime = 0.0;
-                self.movement = Movement::Idle;
             }
             _ => {
                 println!("more");
-
-                self.position.y = self.position.y + JUMP_FORCE_Y;
             }
         }
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
+        println!("{:?}", self.movement);
         match self.movement {
             Movement::Right => self.animation_run_right.play(d, self.position),
             Movement::Left => self.animation_run_left.play(d, self.position),
