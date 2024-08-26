@@ -19,6 +19,9 @@ const MAX_JUMP_TIME: f32 = 0.5;
 const GROUND_HEIGHT: f32 = 400.0;
 const JUMP_FORCE_Y: f32 = 10.0;
 const GRAVITY: f32 = 200.0;
+const PLAYER_SPEED: f32 = 300.0;
+const GROUND_DRAG: f32 = 100.0;
+const AIR_DRAG: f32 = 0.0;
 
 pub struct Player {
     pub position: Vector2,
@@ -78,7 +81,7 @@ impl Player {
                 x: 100.,
                 y: GROUND_HEIGHT - 300.0,
             },
-            speed: 100.0,
+            speed: PLAYER_SPEED,
             animation_run_right,
             animation_run_left,
             animation_idle,
@@ -103,12 +106,13 @@ impl Player {
         self.apply_physics(delta_time);
 
         if self.is_on_ground() {
+            let speed = self.speed - GROUND_DRAG;
             if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
-                self.position.x = self.position.x + self.speed * delta_time;
+                self.position.x = self.position.x + speed * delta_time;
                 self.movement = Movement::Right;
                 self.last_facing = LastFacing::Right;
             } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
-                self.position.x = self.position.x - self.speed * delta_time;
+                self.position.x = self.position.x - speed * delta_time;
                 self.movement = Movement::Left;
                 self.last_facing = LastFacing::Left;
             } else {
@@ -120,12 +124,13 @@ impl Player {
                 self.jump(delta_time);
             }
         } else {
+            let speed = self.speed - AIR_DRAG;
             if rl.is_key_down(KeyboardKey::KEY_RIGHT) {
-                self.position.x = self.position.x + self.speed * delta_time;
+                self.position.x = self.position.x + speed * delta_time;
                 self.movement = Movement::JumpRight;
                 self.last_facing = LastFacing::Right;
             } else if rl.is_key_down(KeyboardKey::KEY_LEFT) {
-                self.position.x = self.position.x - self.speed * delta_time;
+                self.position.x = self.position.x - speed * delta_time;
                 self.movement = Movement::JumpLeft;
                 self.last_facing = LastFacing::Left;
             }
@@ -148,22 +153,18 @@ impl Player {
 
         match self.jumptime {
             x if x < MAX_JUMP_TIME / 2.0 => {
-                println!("less");
                 self.position.y = self.position.y - JUMP_FORCE_Y;
             }
             x if x > MAX_JUMP_TIME => {
-                println!("------------------------------------");
                 self.is_jumping = false;
                 self.jumptime = 0.0;
             }
-            _ => {
-                println!("more");
-            }
+            _ => {}
         }
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
-        println!("{:?}", self.movement);
+        // println!("{:?}", self.movement);
         match self.movement {
             Movement::Right => self.animation_run_right.play(d, self.position),
             Movement::Left => self.animation_run_left.play(d, self.position),
