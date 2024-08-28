@@ -17,11 +17,11 @@ enum LastFacing {
 
 const MAX_JUMP_TIME: f32 = 0.5;
 const GROUND_HEIGHT: f32 = 400.0;
-const JUMP_FORCE_Y: f32 = 10.0;
-const GRAVITY: f32 = 200.0;
+const JUMP_VELOCITY_Y: f32 = -300.0;
+const GRAVITY: f32 = 500.0;
 const PLAYER_SPEED: f32 = 300.0;
 const GROUND_DRAG: f32 = 100.0;
-const AIR_DRAG: f32 = 0.0;
+const AIR_DRAG: f32 = 50.0;
 
 pub struct Player {
     pub position: Vector2,
@@ -35,6 +35,7 @@ pub struct Player {
     is_jumping: bool,
     jumptime: f32,
     last_facing: LastFacing,
+    velocity_y: f32,
 }
 
 impl Player {
@@ -91,6 +92,7 @@ impl Player {
             is_jumping: false,
             jumptime: 0.0,
             last_facing: LastFacing::Right,
+            velocity_y: 0.0,
         }
     }
 
@@ -100,10 +102,8 @@ impl Player {
                 LastFacing::Left => Movement::JumpLeft,
                 LastFacing::Right => Movement::JumpRight,
             };
-            self.jump(delta_time);
+            // self.jump(delta_time);
         }
-
-        self.apply_physics(delta_time);
 
         if self.is_on_ground() {
             let speed = self.speed - GROUND_DRAG;
@@ -121,7 +121,10 @@ impl Player {
 
             if rl.is_key_down(KeyboardKey::KEY_SPACE) {
                 self.is_jumping = true;
-                self.jump(delta_time);
+                self.movement = match self.last_facing {
+                    LastFacing::Left => Movement::JumpLeft,
+                    LastFacing::Right => Movement::JumpRight,
+                }
             }
         } else {
             let speed = self.speed - AIR_DRAG;
@@ -135,32 +138,25 @@ impl Player {
                 self.last_facing = LastFacing::Left;
             }
         }
+
+        self.apply_physics(delta_time);
     }
 
     fn apply_physics(&mut self, delta_time: f32) {
-        if !self.is_on_ground() {
-            self.position.y = self.position.y + GRAVITY * delta_time;
+        if self.is_jumping {
+            self.velocity_y = JUMP_VELOCITY_Y;
+            self.is_jumping = false;
+        } else if self.is_on_ground() {
+            self.velocity_y = 0.0;
+            self.is_jumping = false;
+        } else {
+            self.velocity_y = self.velocity_y + GRAVITY * delta_time;
         }
+        self.position.y = self.position.y + self.velocity_y * delta_time;
     }
 
     fn is_on_ground(&self) -> bool {
         self.position.y >= GROUND_HEIGHT
-    }
-
-    fn jump(&mut self, delta_time: f32) {
-        self.jumptime = self.jumptime + delta_time;
-        println!("{}", self.jumptime);
-
-        match self.jumptime {
-            x if x < MAX_JUMP_TIME / 2.0 => {
-                self.position.y = self.position.y - JUMP_FORCE_Y;
-            }
-            x if x > MAX_JUMP_TIME => {
-                self.is_jumping = false;
-                self.jumptime = 0.0;
-            }
-            _ => {}
-        }
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
