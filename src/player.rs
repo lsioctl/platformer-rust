@@ -15,7 +15,6 @@ enum LastFacing {
     Left,
 }
 
-const MAX_JUMP_TIME: f32 = 0.5;
 const GROUND_HEIGHT: f32 = 400.0;
 const JUMP_VELOCITY_Y: f32 = -300.0;
 const GRAVITY: f32 = 500.0;
@@ -33,7 +32,6 @@ pub struct Player {
     animation_jump_right: animation::Animation,
     movement: Movement,
     is_jumping: bool,
-    jumptime: f32,
     last_facing: LastFacing,
     velocity_y: f32,
 }
@@ -80,7 +78,7 @@ impl Player {
         Self {
             position: Vector2 {
                 x: 100.,
-                y: GROUND_HEIGHT - 300.0,
+                y: GROUND_HEIGHT,
             },
             speed: PLAYER_SPEED,
             animation_run_right,
@@ -90,7 +88,6 @@ impl Player {
             animation_jump_right,
             movement: Movement::Idle,
             is_jumping: false,
-            jumptime: 0.0,
             last_facing: LastFacing::Right,
             velocity_y: 0.0,
         }
@@ -160,7 +157,6 @@ impl Player {
     }
 
     pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
-        // println!("{:?}", self.movement);
         match self.movement {
             Movement::Right => self.animation_run_right.play(d, self.position),
             Movement::Left => self.animation_run_left.play(d, self.position),

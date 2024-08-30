@@ -29,7 +29,8 @@ fn main() {
 
         d.clear_background(Color::WHITE);
 
-        background.draw_static(&mut d);
+        // background.draw_static(&mut d);
+        background.draw(&mut d);
         player.draw(&mut d);
     }
 }
