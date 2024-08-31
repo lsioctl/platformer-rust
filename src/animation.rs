@@ -42,7 +42,7 @@ impl Animation {
         }
     }
 
-    pub fn play(&mut self, d: &mut RaylibDrawHandle, position: Vector2) {
+    pub fn play(&mut self, d: &mut impl RaylibDraw, position: Vector2) {
         // reset state for a new play
         if self.is_playing == false {
             self.is_playing = true;

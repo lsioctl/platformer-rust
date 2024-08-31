@@ -156,7 +156,7 @@ impl Player {
         self.position.y >= GROUND_HEIGHT
     }
 
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
+    pub fn draw(&mut self, d: &mut impl RaylibDraw) {
         match self.movement {
             Movement::Right => self.animation_run_right.play(d, self.position),
             Movement::Left => self.animation_run_left.play(d, self.position),

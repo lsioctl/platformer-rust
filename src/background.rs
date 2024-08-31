@@ -7,10 +7,11 @@ pub struct Background {
     scrolling_mid: f32,
     back_index: usize,
     mid_index: usize,
+    last_player_pos_x: f32,
 }
 
 impl Background {
-    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread) -> Self {
+    pub fn new(rl: &mut RaylibHandle, thread: &RaylibThread, player_pos: Vector2) -> Self {
         let texture_back0 = rl
             .load_texture(&thread, "./ressources/Backgrounds/Layer0_0.png")
             .unwrap();
@@ -38,13 +39,21 @@ impl Background {
             scrolling_mid: 0.0,
             back_index: 0,
             mid_index: 0,
+            last_player_pos_x: player_pos.x,
         }
     }
 
+    pub fn update(&mut self, player_pos: Vector2) {
+        let pos_x_diff = self.last_player_pos_x - player_pos.x;
+
+        self.scrolling_back = self.scrolling_back + 0.1 * pos_x_diff;
+        self.scrolling_mid = self.scrolling_mid + 0.2 * pos_x_diff;
+
+        self.last_player_pos_x = player_pos.x;
+    }
+
     // Draw backgound with parallax
-    pub fn draw(&mut self, d: &mut RaylibDrawHandle) {
-        self.scrolling_back = self.scrolling_back - 0.5;
-        self.scrolling_mid = self.scrolling_mid - 0.8;
+    pub fn draw(&mut self, d: &mut impl RaylibDraw) {
         // println!("{}", self.scrolling_back);
 
         if self.scrolling_back <= -self.texture_back_list[self.back_index].width.as_f32() {
