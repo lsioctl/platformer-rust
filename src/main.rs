@@ -17,16 +17,16 @@ fn main() {
     let mut player = player::Player::new(&mut rl, &thread);
     let mut background = background::Background::new(&mut rl, &thread, player.position);
 
-    // let mut camera = Camera2D {
-    //     // offset: Vector2 { x: 0.0, y: 0.0 },
-    //     offset: Vector2 {
-    //         x: SCREEN_WIDTH as f32 / 2.0,
-    //         y: SCREEN_HEIGHT as f32 / 2.0,
-    //     },
-    //     rotation: 0.0,
-    //     target: player.position,
-    //     zoom: 1.0,
-    // };
+    let mut camera = Camera2D {
+        // offset: Vector2 { x: 0.0, y: 0.0 },
+        offset: Vector2 {
+            x: SCREEN_WIDTH as f32 / 2.0,
+            y: SCREEN_HEIGHT as f32 / 2.0,
+        },
+        rotation: 0.0,
+        target: player.position,
+        zoom: 1.0,
+    };
 
     rl.set_target_fps(60);
 
@@ -42,17 +42,18 @@ fn main() {
         // camera.target = player.position;
         player.update(&rl, delta_time);
         background.update(player.position);
+        camera.target.x = player.position.x;
 
         let mut d = rl.begin_drawing(&thread);
 
         d.clear_background(Color::WHITE);
 
         background.draw(&mut d);
-        player.draw(&mut d);
+        // player.draw(&mut d);
 
-        // {
-        //     let mut d = d.begin_mode2D(camera);
-        //     player.draw(&mut d);
-        // }
+        {
+            let mut d = d.begin_mode2D(camera);
+            player.draw(&mut d);
+        }
     }
 }
