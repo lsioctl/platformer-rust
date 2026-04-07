@@ -41,3 +41,34 @@ https://pls.plaureano.com/blog/files/Example-code-2-rust.php
 ## Parallax reference
 
 https://www.raylib.com/examples/textures/loader.html?name=textures_background_scrolling
+
+
+## Issue to investigate (or not ...)
+
+Got a nasty issue while build raylib-rs with cargo and gcc:
+
+```bash
+--- stderr
+  binding/../raylib/src/raylib.h:88:10: fatal error: 'stdarg.h' file not found
+```
+
+`stdarg.h` was here:
+
+```bash
+# dpkg -S /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h 
+libgcc-13-dev:amd64: /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h
+```
+
+When launching gcc manually as cargo seemed to do, no issue ...
+
+as I noticed a SO post saying to install clang, as I think cargo and rust are
+related a lot to LLVM, and this cargo message:
+
+```bash
+thread 'main' panicked at /home/lsioctl/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/raylib-sys-5.5.1/build.rs:303:39:
+  Unable to generate bindings: ClangDiagnostic("binding/../raylib/src/raylib.h:88:10: fatal error: 'stdarg.h' file not found\n")
+```
+
+I gave up, installed clang ... and it worked :(
+
+
